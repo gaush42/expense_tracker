@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="sign_up.css">
+    <title>Sign Up</title>
+</head>
+<body>
+    <div class="container">
+        <form id="myForm">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" name="fullname">
+      
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email">
+      
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password">
+      
+          <input type="submit" value="Submit">
+        </form>
+      
+        <div class="link-container">
+          <a href="#">Existing User: Log in</a>
+        </div>
+    </div>      
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (e) {
+          const fullName = document.getElementById('fullname').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+      
+          if (!fullName || !email || !password) {
+            alert('Please fill out all fields.');
+            e.preventDefault(); // Stop form submission
+          }
+        });
+    </script>      
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Expenses</title>
+</head>
+<body>
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab(event, 'daily')">Daily</button>
+        <button class="tab-button" onclick="showTab(event, 'monthly')">Monthly</button>
+        <button class="tab-button" onclick="showTab(event, 'yearly')">Yearly</button>
+      </div>
+      
+      <div id="daily" class="tab-content active">
+        <h2>Daily Expenses</h2>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button onclick="changeDate(-1)">⬅️</button>
+          <span id="date-display" style="font-weight: bold; font-size: 1.2em;"></span>
+          <button onclick="changeDate(1)">➡️</button>
+        </div>
+        <div id="expense-data" style="margin-top: 10px;"></div>
+      </div>
+      
+      <div id="monthly" class="tab-content">
+        <h2>Monthly Expenses</h2>
+        <div id="monthly-display" style="font-weight: bold; font-size: 1.2em;"></div>
+      </div>
+      
+      <div id="yearly" class="tab-content">
+        <h2>Yearly Expenses</h2>
+        <div id="yearly-display" style="font-weight: bold; font-size: 1.2em;"></div>
+      </div>
+      
+    <script src="tab_script.js"></script>
+</body>
+</html>
+  

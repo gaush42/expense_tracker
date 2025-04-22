@@ -32,6 +32,18 @@
           if (!email || !password) {
             alert('Please fill out all fields.');
           }
+          axios.post('/api/login', {
+            email: email,
+            password: password
+          })
+          .then(res => {
+            alert(res.data.message || 'Login successful!');
+            document.getElementById('myForm').reset();
+          })
+          .catch(err => {
+            console.error(err);
+            alert(err.response?.data?.message || 'Login failed!');
+          });
         });
     </script>
 </body>

@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <form id="myForm">
+        <form id="loginForm">
           <label for="email">Email</label>
           <input type="email" id="email" name="email">
       
@@ -23,28 +23,6 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        document.getElementById('myForm').addEventListener('submit', function (e) {
-          e.preventDefault();
-          const email = document.getElementById('email').value.trim();
-          const password = document.getElementById('password').value.trim();
-      
-          if (!email || !password) {
-            alert('Please fill out all fields.');
-          }
-          axios.post('/api/login', {
-            email: email,
-            password: password
-          })
-          .then(res => {
-            alert(res.data.message || 'Login successful!');
-            document.getElementById('myForm').reset();
-          })
-          .catch(err => {
-            console.error(err);
-            alert(err.response?.data?.message || 'Login failed!');
-          });
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>

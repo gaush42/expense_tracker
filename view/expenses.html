@@ -31,8 +31,29 @@
             <h3>Your Expenses</h3>
             <ul id="expenses"></ul>
         </div>
+        <button id="buyPremium">Buy Premium</button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="main.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script>
+      const token = localStorage.getItem('token');
+      document.getElementById('buyPremium').addEventListener('click', async () => {
+        try {
+          const res = await axios.post('/api/payment/create', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          const cashfree = Cashfree({ mode: "sandbox" });
+          cashfree.checkout({
+            paymentSessionId: res.data.paymentSessionId,
+            redirectTarget: "_self"
+          });
+        } catch (err) {
+          console.error(err);
+          alert("Failed to initiate payment");
+        }
+      });
+    </script>
 </body>
 </html>

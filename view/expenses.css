@@ -77,6 +77,17 @@
     border-radius: 5px;
     color: #333;
   }
+  #buyPremium {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 
   @media (max-width: 500px) {
     #expense-form-container {

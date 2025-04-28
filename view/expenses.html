@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="expenses.css">
+    <link rel="stylesheet" type="text/css" href="expensesx.css">
     <title>Expenses</title>
 </head>
 <body>
     <div id="expense-form-container">
         <h2>Add Expense</h2>
         <form id="expenseForm">
-          <label>Amount</label><br />
-          <input type="number" id="amount" name="amount" required><br />
+          <label>Amount</label>
+          <input type="number" id="amount" name="amount" required>
       
-          <label>Description</label><br />
-          <input type="text" id="description" name="description" required><br />
+          <label>Description</label>
+          <input type="text" id="description" name="description" required>
       
-          <label>Category</label><br />
+          <label>Category</label>
           <select id="category" name="category" required>
             <option value="">Select</option>
             <option value="Food">Food</option>
             <option value="Petrol">Petrol</option>
             <option value="Salary">Salary</option>
             <option value="Other">Other</option>
-          </select><br /><br />
+          </select>
       
           <button type="submit">Add Expense</button>
         </form>
@@ -35,25 +35,12 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="main.js"></script>
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
-      const token = localStorage.getItem('token');
-      document.getElementById('buyPremium').addEventListener('click', async () => {
-        try {
-          const res = await axios.post('/api/payment/create', {}, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-
-          const cashfree = Cashfree({ mode: "sandbox" });
-          cashfree.checkout({
-            paymentSessionId: res.data.paymentSessionId,
-            redirectTarget: "_self"
-          });
-        } catch (err) {
-          console.error(err);
-          alert("Failed to initiate payment");
-        }
-      });
+      document
+        .getElementById("buyPremium")
+        .addEventListener("click", function () {
+          window.location.href = "./cashfreepay.html";
+        });
     </script>
 </body>
 </html>

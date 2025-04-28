@@ -45,4 +45,21 @@ exports.deleteExpense = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
 }
+exports.getLeaderboard = async (req, res) => {
+    try {
+      const leaderboardUsers = await User.findAll({
+        attributes: ['id', 'name', 'email',
+          [sequelize.fn('SUM', sequelize.col('expenses.amount')), 'totalExpenses']
+        ],
+        include: [{ model: Expense, attributes: [] }],
+        group: ['User.id'],
+        order: [[sequelize.literal('totalExpenses'), 'DESC']]
+      });
+  
+      res.json(leaderboardUsers);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Failed to load leaderboard" });
+    }
+};
   

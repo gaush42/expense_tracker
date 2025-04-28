@@ -58,3 +58,12 @@ exports.Login = async (req, res) => {
         res.status(500).json({ message: 'Server error.' });
     }
 }
+exports.CheckPremiumStatus = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.userId);
+        res.json({ isPremium: user.isPremium });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to fetch user details" });
+    }
+}

@@ -3,6 +3,7 @@ const Expense = require('../model/expenseModel')
 const User = require('../model/userModel')
 
 exports.AddExpense = async (req, res) => {
+    const t = await sequelize.transaction();
     try{
         const { amount, description, category } = req.body;
         const userId = req.userId;
@@ -11,9 +12,11 @@ exports.AddExpense = async (req, res) => {
             description,
             category,
             UserId: userId
-        })
+        }, { transaction: t })
+        await t.commit();
         res.status(201).json({ message: 'Expense added!', expense });
     } catch (err){
+        await t.rollback();
         console.error(err);
         res.status(500).json({ message: 'Failed to add expense' });
     }
@@ -30,18 +33,22 @@ exports.GetExpenses = async (req, res) => {
     }
 }
 exports.deleteExpense = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
       const userId = req.userId;
       const expenseId = req.params.id;
   
-      const expense = await Expense.findOne({ where: { id: expenseId, userId } });
+      const expense = await Expense.findOne({ where: { id: expenseId, userId }, transaction:t });
       if (!expense) {
+        await t.rollback();
         return res.status(404).json({ message: 'Expense not found or unauthorized' });
       }
   
       await expense.destroy();
+      await t.commit();
       res.json({ message: 'Expense deleted successfully' });
     } catch (err) {
+        await t.rollback();
       res.status(500).json({ message: 'Server error' });
     }
 }

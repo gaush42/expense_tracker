@@ -16,6 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
       loadExpenses(); // Optional: auto-load on expense page
     }
 });
+let currentPage = 1;
+let totalPages = 1;
+let expensesPerPage = localStorage.getItem('expensesPerPage') || 10;
+
+document.getElementById('expensesPerPage').value = expensesPerPage;
+
+document.getElementById('expensesPerPage').addEventListener('change', function () {
+  expensesPerPage = this.value;
+  localStorage.setItem('expensesPerPage', expensesPerPage);
+  loadExpenses(1); // Go to first page on change
+});
 
 function handleSignup(e){
     e.preventDefault();
@@ -92,7 +103,7 @@ function handleAddExpense(e){
     })
     .catch(err => alert('Failed to add expense.'));
 }
-function loadExpenses(){
+/*function loadExpenses(){
     const token = localStorage.getItem('token');
     if (!token) return;
 
@@ -122,7 +133,7 @@ function loadExpenses(){
         console.error('Failed to load expenses', err);
         alert('Unauthorized or failed to load expenses.');
     });
-}
+}*/
 function handleDeleteExpense(expenseId) {
     const token = localStorage.getItem('token');
   
@@ -138,5 +149,71 @@ function handleDeleteExpense(expenseId) {
     .catch(err => {
       console.error(err);
       alert(err.response?.data?.message || 'Failed to delete expense.');
+    });
+}
+function renderPagination() {
+    let container = document.getElementById('pagination');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'pagination';
+        container.style.marginTop = '20px';
+        container.style.textAlign = 'center';
+        document.getElementById('expense-form-container').appendChild(container);
+    }
+
+    container.innerHTML = '';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.innerText = 'Previous';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => loadExpenses(currentPage - 1);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.innerText = 'Next';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => loadExpenses(currentPage + 1);
+
+    const info = document.createElement('span');
+    info.innerText = ` Page ${currentPage} of ${totalPages} `;
+    info.style.margin = '0 10px';
+
+    container.appendChild(prevBtn);
+    container.appendChild(info);
+    container.appendChild(nextBtn);
+}
+function loadExpenses(page = 1) {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+  
+    axios.get(`/api/getexpense?page=${page}&limit=${expensesPerPage}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      const { expenses, currentPage: page, totalPages: total } = res.data;
+      currentPage = page;
+      totalPages = total;
+  
+      const list = document.getElementById('expenses');
+      list.innerHTML = '';
+  
+      expenses.forEach(exp => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ₹${exp.amount} - ${exp.description} [${exp.category}]
+          <button onclick="handleDeleteExpense(${exp.id})"
+          style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+          Delete
+          </button>
+        `;
+        list.appendChild(li);
+      });
+  
+      renderPagination();
+    })
+    .catch(err => {
+      console.error('Failed to load expenses', err);
+      alert('Unauthorized or failed to load expenses.');
     });
 }

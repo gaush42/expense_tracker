@@ -22,15 +22,31 @@ exports.AddExpense = async (req, res) => {
     }
 }
 exports.GetExpenses = async (req, res) => {
-    const userId = req.userId;
-
+    /*const userId = req.userId;
     try {
         const expenses = await Expense.findAll({ where: { userId } });
         res.json(expenses);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to fetch expenses' });
-    }
+    }*/
+  const userId = req.user.id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  const { count, rows } = await Expense.findAndCountAll({
+    where: { userId },
+    limit,
+    offset,
+    order: [['createdAt', 'DESC']]
+  });
+
+  res.json({
+    expenses: rows,
+    currentPage: page,
+    totalPages: Math.ceil(count / limit)
+  });
 }
 exports.deleteExpense = async (req, res) => {
     const t = await sequelize.transaction();

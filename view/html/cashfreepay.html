@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Features</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #fef9c3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .premium-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .premium-container h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    .features {
+      text-align: left;
+      margin-bottom: 25px;
+    }
+
+    .features h4 {
+      margin: 8px 0;
+      font-weight: normal;
+      color: #34495e;
+    }
+
+    #payBtn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #payBtn:hover {
+      background-color: #219150;
+    }
+  </style>
+</head>
+<body>
+  <div class="premium-container">
+    <h3>Pay ₹99.00 and unlock premium features</h3>
+
+    <div class="features">
+      <h4>✓ Leaderboard</h4>
+      <h4>✓ Report Generation</h4>
+      <h4>✓ Report Download</h4>
+    </div>
+
+    <button id="payBtn">Pay Now</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <script src="../js/cashfree.js"></script>
+</body>
+</html>

@@ -3,8 +3,9 @@
   }
   
   body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', sans-serif;;
+    background: linear-gradient(135deg, #dbeafe, #fef9c3);
+    min-height: 100vh;
     padding: 20px;
     margin: 0;
   }

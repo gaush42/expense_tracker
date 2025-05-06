@@ -1,14 +1,17 @@
 const express = require('express')
 const router = express.Router()
 const signUpController = require('../controller/userController')
-const forgotpassword = require('../controller/forgotPassController')
+const auth = require('../middleware/auth')
+const leaderboard = require('../controller/leaderboardController')
+const resetPass = require('../controller/resetPassController')
 
 router.post("/signup", signUpController.RegisterUser)
 router.post("/login", signUpController.Login)
-router.get('/checkpremiumstatus', signUpController.CheckPremiumStatus)
+router.get('/userprofile',auth.authenticate, signUpController.getUserProfile)
+router.get('/leaderboard',auth.authenticate, leaderboard.getLeaderboard)
 
-router.post('/password/forgotpassword', forgotpassword.sendResetLink);
-router.get('/password/resetpassword/:id', forgotpassword.getResetForm);
-router.post('/password/updatepassword/:id', forgotpassword.resetPassword);
+router.post('/forgotpassword', resetPass.forgotPassword);
+router.get('/resetpassword/:id', resetPass.getResetPasswordPage);
+router.post('/resetpassword/:id', resetPass.updatePassword);
 
 module.exports = router

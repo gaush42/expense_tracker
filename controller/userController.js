@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 const User = require('../model/userModel')
+const sequelize = require('../config/dbConfig')
 
 exports.RegisterUser = async (req, res) => {
+    const t = await sequelize.transaction()
     try {
         const { fullname, email, password } = req.body
         if(!fullname, !email, !password){
@@ -19,11 +21,16 @@ exports.RegisterUser = async (req, res) => {
             })
         }
         const hashedPassword = await bcrypt.hash(password, 10)
-        const newUser = await User.create({ fullname, email, password:hashedPassword})
+
+        const newUser = await User.create({ fullname, email, password:hashedPassword},
+            {transaction: t}
+        )
+        await t.commit()
         res.status(201).json({
             message: 'User registered successfully.', user: newUser
         })
     } catch (err) {
+        await t.rollback()
         console.error(err)
         res.status(500).json({message: 'Server error.'})
     }
@@ -58,12 +65,14 @@ exports.Login = async (req, res) => {
         res.status(500).json({ message: 'Server error.' });
     }
 }
-exports.CheckPremiumStatus = async (req, res) => {
+exports.getUserProfile = async (req, res) => {
+    const userId = req.userId;
     try {
-        const user = await User.findByPk(req.userId);
-        res.json({ isPremium: user.isPremium });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Failed to fetch user details" });
+      const user = await User.findByPk(userId, {
+        attributes: ['id', 'fullname', 'email', 'isPremium']
+      });
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ message: 'Error fetching user profile' });
     }
-}
+};

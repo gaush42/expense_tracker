@@ -1,5 +1,7 @@
+// models/ForgotPasswordRequest.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/dbConfig');
+const User = require('./userModel');
 
 const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
   id: {
@@ -7,15 +9,13 @@ const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  isActive: {
+  isactive: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
     defaultValue: true,
   },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  }
 });
+
+User.hasMany(ForgotPasswordRequest);
+ForgotPasswordRequest.belongsTo(User);
 
 module.exports = ForgotPasswordRequest;

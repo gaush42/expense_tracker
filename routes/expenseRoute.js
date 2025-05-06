@@ -6,6 +6,6 @@ const auth = require('../middleware/auth')
 router.post("/addexpense",auth.authenticate, expenseController.AddExpense)
 router.get("/getexpense/",auth.authenticate, expenseController.GetExpenses)
 router.delete("/deleteexpense/:id", auth.authenticate, expenseController.deleteExpense)
-router.get('/leaderboard', expenseController.getLeaderboard)
+router.get('/expenses/all',auth.authenticate, expenseController.GetAllExpense)
 
 module.exports = router

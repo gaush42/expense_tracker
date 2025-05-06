@@ -1,6 +1,5 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../config/dbConfig')
-const ForgotPasswordRequest = require('./forgotPassReqModel')
 
 const User = sequelize.define('User', {
     id:{
@@ -22,10 +21,11 @@ const User = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    isPremium:{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
 })
-
-User.hasMany(ForgotPasswordRequest);
-ForgotPasswordRequest.belongsTo(User);
-
 module.exports = User

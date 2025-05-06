@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Day-to-Day Expense - Welcome</title>
+  <style>
+    /* Reset and Base Styles */
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #dbeafe, #fef9c3);
+    color: #2b2b2b;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    }
+
+    .container {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Header */
+    header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    }
+    .highlight {
+    color: #ffdd57;
+    }
+    header p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    }
+
+    /* Buttons */
+    .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    }
+    .btn {
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: 0.3s;
+    }
+    .signup {
+    background-color: #fff;
+    color: #2575fc;
+    }
+    .signup:hover {
+    background-color: #e0e0e0;
+    }
+    .login {
+    background-color: #2575fc;
+    color: #fff;
+    border: 2px solid #fff;
+    }
+    .login:hover {
+    background-color: #1a5ed9;
+    }
+
+    /* Features */
+    .features h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    }
+    .features ul {
+    list-style: none;
+    font-size: 1rem;
+    line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+    margin-top: 25px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Welcome to <span class="highlight">Day-to-Day Expense</span></h1>
+      <p>Track your daily expenses smartly and efficiently.</p>
+    </header>
+
+    <div class="buttons">
+      <a href="/html/sign_up.html" class="btn signup">Sign Up</a>
+      <a href="/html/login.html" class="btn login">Login</a>
+    </div>
+
+    <section class="features">
+      <h2>Features</h2>
+      <ul>
+        <li>📅 Daily, Monthly & Yearly expense tracking</li>
+        <li>🔐 Secure and private</li>
+        <li>📱 Mobile-friendly and fast</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 Day-to-Day Expense. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>

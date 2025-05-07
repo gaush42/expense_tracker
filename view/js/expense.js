@@ -178,7 +178,7 @@ function logout() {
 function gotoLeaderboard(){
     window.location.href = '/html/leaderboard.html';
 }
-async function downloadReport() {
+/*async function downloadReport() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const token = localStorage.getItem('token');
@@ -263,7 +263,7 @@ async function downloadReport() {
       month,
       `₹${total.toFixed(2)}`
     ]);*/
-    const monthNames = [
+    /*const monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
@@ -296,6 +296,20 @@ async function downloadReport() {
   } catch (err) {
     console.error('Error generating PDF:', err);
     alert('You are not a Premium User');
+  }
+}*/
+async function reportDownload() {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await axios.get('/api/report/download', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.data.fileUrl) {
+      window.open(res.data.fileUrl, '_blank');
+    }
+  } catch (err) {
+    console.error('Download failed:', err);
+    alert('Report download failed or you are not a premium user.');
   }
 }
 

@@ -29,7 +29,7 @@ exports.createOrder = async (req, res) => {
         customer_phone: "9999999999"
       },
       order_meta: {
-        return_url: `http://localhost:3000/login.html?order_id=${orderId}`,
+        return_url: `http://13.232.161.75:3000/login.html?order_id=${orderId}`,
         //notify_url: "http://localhost:3000/api/payment/callback",
         payment_methods: "cc,dc,upi"
       }

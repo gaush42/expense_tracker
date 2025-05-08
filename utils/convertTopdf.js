@@ -3,7 +3,7 @@ const {autoTable} = require('jspdf-autotable');
 const fs = require('fs');
 const path = require('path');
 
-function convertToPdf(expenses, filePath) {
+function convertToPdf(expenses) {
   const doc = new jsPDF();
   const dailyRows = [];
     const monthlyTotals = {};
@@ -103,7 +103,7 @@ function convertToPdf(expenses, filePath) {
         `Rs ${total.toFixed(2)}`
     ]);
     addTable(['#', 'Year', 'Total Expense'], yearlyRows);
-  doc.save(filePath);
+  return doc.output('arraybuffer');
 }
 
 module.exports = convertToPdf;

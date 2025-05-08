@@ -138,27 +138,18 @@ exports.downloadReport = async (req, res) => {
 
     const expenses = await Expense.findAll({ where: { userId }, order: [['createdAt', 'ASC']] });
 
+    const pdfBuffer = Buffer.from(convertToPdf(expenses));
     const fileName = `Expense_Report_${userId}_${Date.now()}.pdf`;
-    const filePath = path.join(__dirname, '..', 'temp', fileName);
-
-    // Generate the PDF file
-    convertToPdf(expenses, filePath);
-
-    // Read the PDF and upload to S3
-    const fileContent = fs.readFileSync(filePath);
 
     const s3Params = {
       Bucket: process.env.S3_BUCKET,
       Key: `reports/${fileName}`,
-      Body: fileContent,
+      Body: pdfBuffer,
       ContentType: 'application/pdf',
       ACL: 'public-read'
     };
 
     const s3Upload = await s3.upload(s3Params).promise();
-
-    // Delete local file after upload
-    fs.unlinkSync(filePath);
 
     // Respond with S3 URL
     res.json({ fileUrl: s3Upload.Location });

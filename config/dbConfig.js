@@ -27,6 +27,7 @@ const sequelize = new Sequelize(
       A connection becomes available (within the time specified by acquire), or
       The request times out (if it waits longer than acquire ms), in which case Sequelize will throw a connection timeout error.
        */
+      logging: false,
       pool: {
         max: 5, // Maximum number of connections in pool
         min: 0, // Minimum number of connections in pool

@@ -7,6 +7,9 @@ const auth = require('../middleware/auth'); // your JWT middleware
 router.post('/create', auth.authenticate, paymentController.createOrder);
 
 //router.get('/verify-payment', paymentController.verifyPayment);
-router.post("/cashfree-webhook", express.raw({ type: 'application/json' }), paymentController.handleCashfreeWebhook);
+router.post(
+  "/cashfree-webhook",
+  paymentController.handleCashfreeWebhook
+);
 
 module.exports = router;

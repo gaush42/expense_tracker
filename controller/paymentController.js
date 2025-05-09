@@ -3,6 +3,7 @@ const sequelize = require('../config/dbConfig');
 const Order = require('../model/orderModel');
 const User = require('../model/userModel')
 const { Cashfree } = require('cashfree-pg');
+const crypto = require('crypto');
 require("dotenv").config()
 
 const cashfree = new Cashfree(Cashfree.SANDBOX, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY)
@@ -30,7 +31,7 @@ exports.createOrder = async (req, res) => {
       },
       order_meta: {
         return_url: `http://13.232.161.75//html/login.html?order_id=${orderId}`,
-        //notify_url: "http://localhost:3000/api/payment/callback",
+        notify_url: `http://13.232.161.75/api/cashfree-webhook`,
         payment_methods: "cc,dc,upi"
       }
     };
@@ -55,7 +56,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-exports.verifyPayment = async (req, res) => {
+/*exports.verifyPayment = async (req, res) => {
   const orderId = req.query.order_id;
   const t = await sequelize.transaction();
   try {
@@ -91,5 +92,46 @@ exports.verifyPayment = async (req, res) => {
     await t.rollback();
     console.error(err);
     res.status(500).json({ message: 'Failed to verify payment status' });
+  }
+};*/
+const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
+
+exports.handleCashfreeWebhook = async (req, res) => {
+  try {
+    const signature = req.headers['x-webhook-signature'];
+    const rawBody = req.body.toString(); // Required for signature verification
+
+    const expectedSignature = crypto
+      .createHmac('sha256', CASHFREE_SECRET_KEY)
+      .update(rawBody)
+      .digest('base64');
+
+    if (signature !== expectedSignature) {
+      console.warn("Invalid Cashfree webhook signature");
+      return res.status(400).send("Invalid signature");
+    }
+
+    const payload = JSON.parse(rawBody);
+    const orderId = payload.data.order.order_id;
+    const paymentStatus = payload.data.payment.payment_status;
+
+    await Order.update({ status: paymentStatus }, { where: { orderId } });
+
+    if (paymentStatus === "SUCCESS") {
+      const order = await Order.findOne({ where: { orderId } });
+      if (order) {
+        await User.update(
+          { premiumMember: true },
+          { where: { id: order.userId } }
+        );
+        console.log("User upgraded to premium:", order.userId);
+      }
+    }
+
+    res.status(200).json({ success: true });
+
+  } catch (error) {
+    console.error("Webhook error:", error.message);
+    res.status(500).json({ success: false });
   }
 };

@@ -67,21 +67,28 @@ exports.handleCashfreeWebhook = async (req, res) => {
     //console.log("✅ Webhook verified");
 
     //console.log(req);
-
     const orderId = req.body.data.order.order_id;
     const paymentStatus = req.body.data.payment.payment_status;
 
     console.log(`Order ID: ${orderId}, Payment Status: ${paymentStatus}`);
 
-    // Update order and user premium status
+    // Find the order
     const order = await Order.findOne({ where: { orderId } });
-    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
 
+    // 🚨 Idempotency check
+    if (order.status === 'SUCCESS' || order.status === 'FAILED') {
+      console.log("🚫 Order already processed, skipping DB update.");
+      return res.status(200).json({ success: true, message: "Already processed" });
+    }
+
+    // Process status
     if (paymentStatus === 'SUCCESS') {
-      order.status = 'SUCCESSFUL';
+      order.status = 'SUCCESS';
       await order.save();
 
-      // Make user premium
       const user = await User.findByPk(order.userId);
       user.isPremium = true;
       await user.save();
@@ -96,7 +103,9 @@ exports.handleCashfreeWebhook = async (req, res) => {
     }
 
     return res.status(200).json({ success: true });
+
   } catch (e) {
-    console.log(e); // Log any errors
+    console.error("Webhook Error:", e);
+    return res.status(500).json({ success: false });
   }
 };

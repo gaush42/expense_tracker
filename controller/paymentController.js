@@ -28,8 +28,8 @@ exports.createOrder = async (req, res) => {
         customer_phone: "9999999999"
       },
       order_meta: {
-        return_url: `http://13.232.161.75/html/login.html?order_id=${orderId}`,
-        notify_url: `http://13.232.161.75/api/cashfree-webhook`,
+        return_url: `http://13.201.80.151/html/login.html?order_id=${orderId}`,
+        notify_url: `http://13.201.80.151/api/cashfree-webhook`,
         payment_methods: "cc,dc,upi"
       }
     };

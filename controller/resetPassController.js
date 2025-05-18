@@ -46,7 +46,7 @@ exports.forgotPassword = async (req, res) => {
       htmlContent:`
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
         <p style="font-size: 16px;">Click below to reset your password:</p>
-        <a href="http://localhost:3000/api/resetpassword/${id}" 
+        <a href="http://13.201.80.151/api/resetpassword/${id}" 
           style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
           Reset Password
         </a>

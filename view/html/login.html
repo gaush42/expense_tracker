@@ -25,17 +25,5 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="../js/login.js"></script>
-    <script>
-      window.onload = function () {
-        const params = new URLSearchParams(window.location.search);
-        const orderId = params.get('order_id');
-        if (orderId) {
-          fetch(`/api/verify-payment?order_id=${orderId}`)
-            .then(res => res.json())
-            .then(data => alert(data.message))
-            .catch(err => console.error('Verification failed', err));
-        }
-      }
-    </script>
 </body>
 </html>

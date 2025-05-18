@@ -18,8 +18,6 @@ const userRoutes = require('./routes/userRoute');
 const expenseRoute = require('./routes/expenseRoute');
 const paymentRoute = require('./routes/paymentRoutes');
 
-const paymentController = require('./controller/paymentController')
-
 // Load environment variables from .env file
 require("dotenv").config();
 

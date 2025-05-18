@@ -3,7 +3,7 @@ const User = require('../model/userModel');
 const { Sequelize } = require('sequelize');
 
 exports.getLeaderboard = async (req, res) => {
-    const userId = req.userId;
+  const userId = req.userId;
   try {
     // Check if the user is premium
     const user = await User.findByPk(userId);
@@ -12,17 +12,9 @@ exports.getLeaderboard = async (req, res) => {
     }
 
     // Aggregate total expenses by user
-    const leaderboard = await Expense.findAll({
-      attributes: [
-        'userId',
-        [Sequelize.fn('SUM', Sequelize.col('amount')), 'totalExpense']
-      ],
-      include: [{
-        model: User,
-        attributes: ['fullname', 'email']
-      }],
-      group: ['userId'],
-      order: [[Sequelize.literal('totalExpense'), 'DESC']]
+    const leaderboard = await User.findAll({
+      attributes: ['id', 'fullname', 'email', 'totalexpense'],
+      order: [['totalexpense', 'DESC']]
     });
 
     res.json(leaderboard);

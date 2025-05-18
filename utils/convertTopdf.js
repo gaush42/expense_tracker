@@ -1,7 +1,5 @@
 const { jsPDF } = require('jspdf');
 const {autoTable} = require('jspdf-autotable');
-const fs = require('fs');
-const path = require('path');
 
 function convertToPdf(expenses) {
   const doc = new jsPDF();

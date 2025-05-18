@@ -20,6 +20,10 @@ exports.AddExpense = async (req, res) => {
         category,
         UserId: userId
     }, {transaction: t})
+    // 2. Update the user's totalexpense within the same transaction
+    const user = await User.findByPk(userId, { transaction: t });
+    user.totalexpense += parseFloat(amount);
+    await user.save({ transaction: t });
     // Commit the transaction after successful creation
     await t.commit();
     // Respond with success and the newly created expense object

@@ -18,8 +18,8 @@ function LoadLeaderBoard(){
 
         row.innerHTML = `
         <td>${index + 1}</td>
-        <td>${user.User.fullname}</td>
-        <td>₹${parseFloat(user.totalExpense).toFixed(2)}</td>
+        <td>${user.fullname}</td>
+        <td>₹${parseFloat(user.totalexpense).toFixed(2)}</td>
         `;
         leaderboardBody.appendChild(row);
     });

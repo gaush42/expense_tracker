@@ -134,7 +134,7 @@ function checkPremiumStatus() {
 }
 function logout() {
     localStorage.removeItem('token');
-    window.location.href = '/html/login.html'; // or wherever your login page is
+    window.location.href = '/html/login.html';
 }
 function gotoLeaderboard(){
     window.location.href = '/html/leaderboard.html';

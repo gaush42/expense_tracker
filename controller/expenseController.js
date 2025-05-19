@@ -39,7 +39,7 @@ exports.GetExpenses = async (req, res) => {
 
   const userId = req.userId;
   // Parse pagination parameters from query string, set default values if not provided
-  const page = parseInt(req.query.page) || 1; // default page is 5
+  const page = parseInt(req.query.page) || 1; // default page is 1
   const limit = parseInt(req.query.limit) || 10;  // default number of expenses per page is 10
   // calculate offset based on page and limit
   // How many records to skip before starting to fetch the current page data
@@ -68,10 +68,17 @@ exports.deleteExpense = async (req, res) => {
     // Get the expense ID from the request parameters
     const expenseId = req.params.id;
     // Find the expense belonging to the user with the given ID
-    const expense = await Expense.findOne({ where: { id: expenseId, userId } });
+    const expense = await Expense.findOne({ where: { id: expenseId, userId } }, {transaction: t});
     if (!expense) {
       return res.status(404).json({ message: 'Expense not found or unauthorized' });
     }
+    // Subtract the amount from totalexpense
+    const user = await User.findByPk(userId, { transaction: t });
+    user.totalexpense -= parseFloat(expense.amount);
+    if (user.totalexpense < 0){
+      user.totalexpense = 0;
+    }
+    await user.save({ transaction: t });
     await expense.destroy();
     await t.commit()
     res.json({ message: 'Expense deleted successfully' });

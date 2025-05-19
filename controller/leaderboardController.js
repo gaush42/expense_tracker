@@ -1,6 +1,4 @@
-const Expense = require('../model/expenseModel');
 const User = require('../model/userModel');
-const { Sequelize } = require('sequelize');
 
 exports.getLeaderboard = async (req, res) => {
   const userId = req.userId;

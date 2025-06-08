@@ -1,35 +1,40 @@
-const {DataTypes} = require('sequelize')
-const sequelize = require('../config/dbConfig')
+// models/userModel.js
+const mongoose = require('mongoose');
 
-const User = sequelize.define('User', {
-    id:{
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true,
-    },
-    fullname:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    email:{
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {isEmail: true},
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    totalexpense: {
-        type: DataTypes.FLOAT,
-        defaultValue: 0
-    },
-    isPremium:{
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+const userSchema = new mongoose.Schema({
+  fullname: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    validate: {
+      validator: function (v) {
+        // Basic email regex validation
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: props => `${props.value} is not a valid email!`
     }
-})
-module.exports = User
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  totalexpense: {
+    type: Number,
+    default: 0
+  },
+  isPremium: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
+}, {
+  timestamps: true
+});
+
+const User = mongoose.model('User', userSchema);
+module.exports = User;

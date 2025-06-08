@@ -1,21 +1,32 @@
-// models/ForgotPasswordRequest.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig');
-const User = require('./userModel');
+// models/forgotPasswordRequestModel.js
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
+const forgotPasswordRequestSchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    default: uuidv4 // Use UUID string as the _id
   },
   isactive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    type: Boolean,
+    default: true
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, {
+  timestamps: true
 });
 
-User.hasMany(ForgotPasswordRequest);
-ForgotPasswordRequest.belongsTo(User);
+// Optional alias if you still want to call it 'id'
+forgotPasswordRequestSchema.virtual('id').get(function () {
+  return this._id;
+});
 
+forgotPasswordRequestSchema.set('toJSON', { virtuals: true });
+forgotPasswordRequestSchema.set('toObject', { virtuals: true });
+
+const ForgotPasswordRequest = mongoose.model('ForgotPasswordRequest', forgotPasswordRequestSchema);
 module.exports = ForgotPasswordRequest;

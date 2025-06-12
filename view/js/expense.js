@@ -144,11 +144,16 @@ async function reportDownload() {
   const token = localStorage.getItem('token');
   try {
     const res = await axios.get('/api/report/download', {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob' // Important: tells axios to treat response as binary
     });
-    if (res.data.fileUrl) {
-      window.open(res.data.fileUrl, '_blank');
-    }
+
+    // Create a Blob URL from the response
+    const blob = new Blob([res.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    // Open the PDF in a new tab
+    window.open(url, '_blank');
   } catch (err) {
     console.error('Download failed:', err);
     alert('Report download failed or you are not a premium user.');

@@ -2,18 +2,18 @@ const User = require('../model/userModel');
 
 exports.getLeaderboard = async (req, res) => {
   const userId = req.userId;
+
   try {
     // Check if the user is premium
-    const user = await User.findByPk(userId);
+    const user = await User.findById(userId);
     if (!user || !user.isPremium) {
       return res.status(403).json({ message: 'Access denied: Not a premium user' });
     }
 
-    // Aggregate total expenses by user
-    const leaderboard = await User.findAll({
-      attributes: ['id', 'fullname', 'email', 'totalexpense'],
-      order: [['totalexpense', 'DESC']]
-    });
+    // Fetch leaderboard sorted by totalexpense descending
+    const leaderboard = await User.find({})
+      .select('fullname email totalexpense')
+      .sort({ totalexpense: -1 });
 
     res.json(leaderboard);
   } catch (err) {

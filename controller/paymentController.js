@@ -2,6 +2,7 @@ const sequelize = require('../config/dbConfig');
 const Order = require('../model/orderModel');
 const User = require('../model/userModel')
 const { Cashfree } = require('cashfree-pg');
+const mongoose = require('mongoose');
 require("dotenv").config()
 
 const cashfree = new Cashfree(Cashfree.SANDBOX, process.env.CASHFREE_APP_ID, process.env.CASHFREE_SECRET_KEY)
@@ -10,14 +11,15 @@ const cashfree = new Cashfree(Cashfree.SANDBOX, process.env.CASHFREE_APP_ID, pro
 //Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
 
 exports.createOrder = async (req, res) => {
-  const userId = req.userId;
-  const email = req.email;
-  const orderId = `order_${Date.now()}`;
-  const amount = 99.0; // Premium cost
-
-  const t = await sequelize.transaction();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
+    const userId = req.userId;
+    const email = req.email;
+    const orderId = `order_${Date.now()}`;
+    const amount = 99.0;
+
     const request = {
       order_id: orderId,
       order_amount: amount,
@@ -36,62 +38,59 @@ exports.createOrder = async (req, res) => {
 
     const response = await cashfree.PGCreateOrder(request);
 
-    await Order.create({
+    // Save to MongoDB with Mongoose transaction
+    const newOrder = new Order({
       orderId,
       paymentSessionId: response.data.payment_session_id,
       amount,
       status: "PENDING",
-      userId,
-    }, {transaction: t});
+      user: userId
+    });
 
-    await t.commit();
+    await newOrder.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
     res.json({ paymentSessionId: response.data.payment_session_id });
 
   } catch (err) {
-    await t.rollback();
+    await session.abortTransaction();
+    session.endSession();
     console.error(err);
     res.status(500).json({ message: 'Failed to create order' });
   }
 };
 
 exports.handleCashfreeWebhook = async (req, res) => {
-
   try {
-    // Verify the webhook signature using Cashfree SDK
-    /*const response = await cashfree.PGVerifyWebhookSignature(
-      req.headers["x-webhook-signature"], // Webhook signature header
-      JSON.stringify(req.body), // Webhook payload
-      req.headers["x-webhook-timestamp"] // Webhook timestamp header
-    );*/
-    //console.log(response); // Log the verification response
-    //console.log("✅ Webhook verified");
-
-    //console.log(req);
     const orderId = req.body.data.order.order_id;
     const paymentStatus = req.body.data.payment.payment_status;
 
     console.log(`Order ID: ${orderId}, Payment Status: ${paymentStatus}`);
 
-    // Find the order
-    const order = await Order.findOne({ where: { orderId } });
+    // Find the order by orderId
+    const order = await Order.findOne({ orderId });
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // 🚨 Idempotency check
+    // Idempotency check: skip if already SUCCESS or FAILED
     if (order.status === 'SUCCESS' || order.status === 'FAILED') {
       console.log("🚫 Order already processed, skipping DB update.");
       return res.status(200).json({ success: true, message: "Already processed" });
     }
 
-    // Process status
+    // Process payment status
     if (paymentStatus === 'SUCCESS') {
       order.status = 'SUCCESS';
       await order.save();
 
-      const user = await User.findByPk(order.userId);
-      user.isPremium = true;
-      await user.save();
+      const user = await User.findById(order.user);
+      if (user) {
+        user.isPremium = true;
+        await user.save();
+      }
 
       return res.json({ message: "Payment successful, user upgraded!" });
 
@@ -102,6 +101,7 @@ exports.handleCashfreeWebhook = async (req, res) => {
       return res.json({ message: "Payment failed." });
     }
 
+    // For other statuses
     return res.status(200).json({ success: true });
 
   } catch (e) {

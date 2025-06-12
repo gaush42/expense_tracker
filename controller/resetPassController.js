@@ -4,6 +4,7 @@ const ForgotPasswordRequest = require('../model/passwordResetModel');
 const User = require('../model/userModel');
 const Sib = require('sib-api-v3-sdk');
 const sequelize = require('../config/dbConfig');
+const mongoose = require('mongoose');
 
 
 exports.forgotPassword = async (req, res) => {
@@ -19,31 +20,42 @@ exports.forgotPassword = async (req, res) => {
     name: 'Day-to-Day Expense'
   };
 
-  const receivers = [{ email: email }]; // Or use the `email` from req.body
+  const receivers = [{ email }];
 
-  const t = await sequelize.transaction();
+  // Start a session for transaction if your MongoDB supports it
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const user = await User.findOne({ where: { email },
-      transaction: t
-     });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    // Find user by email within session
+    const user = await User.findOne({ email }).session(session);
+    if (!user) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     const id = uuidv4();
-    await ForgotPasswordRequest.create({
-      id,
-      UserId: user.id,
-      isactive: true,
-    }, {transaction: t});
 
-    await t.commit()
+    // Create ForgotPasswordRequest doc within session
+    await ForgotPasswordRequest.create(
+      [{
+        _id: id,
+        user: user._id,
+        isactive: true,
+      }],
+      { session }
+    );
 
+    await session.commitTransaction();
+    session.endSession();
+
+    // Send transactional email
     const result = await transEmailApi.sendTransacEmail({
       sender,
       to: receivers,
       subject: 'Reset your password',
-      /*htmlContent: `<p>Click below to reset your password:</p>
-        <a href="http://localhost:3000/api/resetpassword/${id}">Reset Password</a>`,*/
-      htmlContent:`
+      htmlContent: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
         <p style="font-size: 16px;">Click below to reset your password:</p>
         <a href="http://13.201.80.151/api/resetpassword/${id}" 
@@ -60,20 +72,24 @@ exports.forgotPassword = async (req, res) => {
     console.log('Email sent successfully!', result);
     res.status(200).json({ message: 'Email sent successfully!' });
   } catch (error) {
-    await t.rollback();
+    await session.abortTransaction();
+    session.endSession();
     console.error('Error sending email:', error);
     res.status(500).json({ message: 'Failed to send email', error: error.message });
   }
 };
 
 exports.getResetPasswordPage = async (req, res) => {
-  try{
+  try {
     const { id } = req.params;
-    const request = await ForgotPasswordRequest.findOne({ where: { id } });
-  
+
+    // Mongoose style query
+    const request = await ForgotPasswordRequest.findOne({ _id: id });
+
     if (!request || !request.isactive) {
       return res.status(400).send('Invalid or expired password reset link.');
     }
+
     res.send(`
       <!DOCTYPE html>
       <html lang="en">
@@ -98,41 +114,36 @@ exports.getResetPasswordPage = async (req, res) => {
       </body>
       </html>
     `);
-  }catch (err){
+  } catch (err) {
     console.error(err);
     res.status(500).send('Something went wrong while loading the reset page.');
   }
-        
 };
 
 exports.updatePassword = async (req, res) => {
-  const t = await sequelize.transaction()
-  
   try {
     const { id } = req.params;
     const { password } = req.body;
 
-    const request = await ForgotPasswordRequest.findOne({ where: { id }, transaction: t });
+    const request = await ForgotPasswordRequest.findOne({ _id: id });
     if (!request || !request.isactive) {
       return res.status(400).send('Invalid or expired password reset request.');
     }
 
-    const user = await User.findByPk(request.UserId, { transaction: t });
+    const user = await User.findById(request.UserId);
     if (!user) {
       return res.status(404).send('User not found.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
-    await user.save({ transaction: t });
+    await user.save();
 
     request.isactive = false;
-    await request.save({ transaction: t });
+    await request.save();
 
-    await t.commit();
     res.send('Password updated successfully!');
   } catch (err) {
-    await t.rollback();
     console.error(err);
     res.status(500).send('Server error.');
   }

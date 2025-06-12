@@ -7,23 +7,34 @@
     <title>Login</title>
 </head>
 <body>
-    <div class="container">
-        <form id="loginForm">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email">
-      
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password">
-      
-          <input type="submit" value="Submit">
-        </form>
-      
-        <div class="link-container">
-          <a href="/html/sign_up.html">New User: Sign Up</a>
-          <a href="/html/forgotPass.html">| Forgot Password</a>
-        </div>
+  <div class="split-container">
+    <div class="left-panel">
+      <form id="loginForm">
+        <h2>Login</h2>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" />
+
+        <input type="submit" value="Submit" />
+      </form>
+      <div class="link-container">
+        <a href="/html/sign_up.html">New User: Sign Up</a>
+        <a href="/html/forgotPass.html">| Forgot Password</a>
+      </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="../js/login.js"></script>
+    <div class="right-panel">
+      <div class="info">
+        <h1>Welcome to Day-to-Day Expense</h1>
+        <p>Track your expenses effortlessly and stay on top of your budget.</p>
+        <img src="https://plus.unsplash.com/premium_photo-1679922389535-7f4badadc07c?auto=format&fit=crop&w=600&q=80" alt="Finance illustration" />
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="../js/login.js"></script>
 </body>
 </html>

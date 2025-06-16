@@ -8,14 +8,12 @@ exports.RegisterUser = async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
 
-    // Check for missing fields
     if (!fullname || !email || !password) {
       return res.status(400).json({
         message: 'All fields are required.'
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
@@ -23,10 +21,8 @@ exports.RegisterUser = async (req, res) => {
       });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save the user
     const newUser = new User({
       fullname,
       email,
@@ -54,20 +50,16 @@ exports.Login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Find user by email
     const user = await User.findOne({ email });
 
-    // If user not found or password doesn't match
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
@@ -90,7 +82,7 @@ exports.Login = async (req, res) => {
 };
 
 exports.getUserProfile = async (req, res) => {
-  const userId = req.userId; // This should come from your auth middleware
+  const userId = req.userId;
 
   try {
     const user = await User.findById(userId).select('fullname email isPremium');

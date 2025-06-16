@@ -22,12 +22,10 @@ exports.forgotPassword = async (req, res) => {
 
   const receivers = [{ email }];
 
-  // Start a session for transaction if your MongoDB supports it
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // Find user by email within session
     const user = await User.findOne({ email }).session(session);
     if (!user) {
       await session.abortTransaction();
@@ -37,7 +35,6 @@ exports.forgotPassword = async (req, res) => {
 
     const id = uuidv4();
 
-    // Create ForgotPasswordRequest doc within session
     await ForgotPasswordRequest.create(
       [{
         _id: id,
@@ -50,7 +47,6 @@ exports.forgotPassword = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    // Send transactional email
     const result = await transEmailApi.sendTransacEmail({
       sender,
       to: receivers,

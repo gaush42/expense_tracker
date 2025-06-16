@@ -2,7 +2,7 @@ let currentPage = 1;
 document.addEventListener('DOMContentLoaded', () => {
   const expenseForm = document.getElementById('expenseForm');
   const perPageSelect = document.getElementById('expensesPerPage');
-    // Set default or stored value
+
   const savedPerPage = localStorage.getItem('expensesPerPage') || 5;
   perPageSelect.value = savedPerPage;
 
@@ -98,7 +98,7 @@ function handleDeleteExpense(expenseId) {
     })
     .then(res => {
       alert(res.data.message || 'Expense deleted successfully!');
-      loadExpenses(); // Refresh the expense list if needed
+      loadExpenses();
     })
     .catch(err => {
       console.error(err);
@@ -145,14 +145,13 @@ async function reportDownload() {
   try {
     const res = await axios.get('/api/report/download', {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob' // Important: tells axios to treat response as binary
+      responseType: 'blob'
     });
 
-    // Create a Blob URL from the response
+
     const blob = new Blob([res.data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
 
-    // Open the PDF in a new tab
     window.open(url, '_blank');
   } catch (err) {
     console.error('Download failed:', err);

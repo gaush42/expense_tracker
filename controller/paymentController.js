@@ -38,7 +38,6 @@ exports.createOrder = async (req, res) => {
 
     const response = await cashfree.PGCreateOrder(request);
 
-    // Save to MongoDB with Mongoose transaction
     const newOrder = new Order({
       orderId,
       paymentSessionId: response.data.payment_session_id,
@@ -69,19 +68,16 @@ exports.handleCashfreeWebhook = async (req, res) => {
 
     console.log(`Order ID: ${orderId}, Payment Status: ${paymentStatus}`);
 
-    // Find the order by orderId
     const order = await Order.findOne({ orderId });
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // Idempotency check: skip if already SUCCESS or FAILED
     if (order.status === 'SUCCESS' || order.status === 'FAILED') {
       console.log("🚫 Order already processed, skipping DB update.");
       return res.status(200).json({ success: true, message: "Already processed" });
     }
 
-    // Process payment status
     if (paymentStatus === 'SUCCESS') {
       order.status = 'SUCCESS';
       await order.save();
@@ -101,7 +97,6 @@ exports.handleCashfreeWebhook = async (req, res) => {
       return res.json({ message: "Payment failed." });
     }
 
-    // For other statuses
     return res.status(200).json({ success: true });
 
   } catch (e) {

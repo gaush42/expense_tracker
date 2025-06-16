@@ -12,16 +12,14 @@ exports.AddExpense = async (req, res) => {
     const { amount, description, category } = req.body;
     const userId = req.userId;
 
-    // Create new expense document
     const expense = new Expense({
       amount,
       description,
       category,
-      user: userId // assuming 'user' is the ref field in Expense schema
+      user: userId
     });
     await expense.save();
 
-    // Update the user's total expense
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -44,12 +42,10 @@ exports.GetExpenses = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    // Get total count of user's expenses
     const count = await Expense.countDocuments({ user: userId });
 
-    // Fetch paginated expenses
     const expenses = await Expense.find({ user: userId })
-      .sort({ createdAt: -1 }) // Newest first
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -70,7 +66,6 @@ exports.deleteExpense = async (req, res) => {
     const userId = req.userId;
     const expenseId = req.params.id;
 
-    // Find the expense document by ID and user
     const expense = await Expense.findOne({ _id: expenseId, user: userId }).session(session);
 
     if (!expense) {
@@ -79,7 +74,6 @@ exports.deleteExpense = async (req, res) => {
       return res.status(404).json({ message: 'Expense not found or unauthorized' });
     }
 
-    // Find the user and update totalexpense
     const user = await User.findById(userId).session(session);
     user.totalexpense -= parseFloat(expense.amount);
     if (user.totalexpense < 0) user.totalexpense = 0;
@@ -149,7 +143,6 @@ exports.downloadReport = async (req, res) => {
   const userId = req.userId;
 
   try {
-    // Check if user is premium
     const user = await User.findById(userId);
     if (!user || !user.isPremium) {
       return res.status(403).json({ message: 'Access denied' });
@@ -157,14 +150,12 @@ exports.downloadReport = async (req, res) => {
 
     const expenses = await Expense.find({ user: userId }).sort({ createdAt: 1 });
 
-    // Set PDF headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'inline; filename="Expense_Report.pdf"');
 
     const doc = new PDFDocument({ margin: 30, size: 'A4' });
-    doc.pipe(res); // Stream PDF directly to browser
+    doc.pipe(res);
 
-    // --- PDF LOGIC ---
     const dailyRows = [];
     const monthlyTotals = {};
     const yearlyTotals = {};
@@ -207,9 +198,6 @@ exports.downloadReport = async (req, res) => {
       doc.addPage();
     };
 
-    // Daily Report
-    //doc.fontSize(16).text('Daily Report', { align: 'center' });
-    //doc.moveDown();
     drawTable('Daily Report', ['#', 'Date', 'Amount', 'Description', 'Category'], dailyRows);
 
     // Monthly Report
@@ -232,7 +220,7 @@ exports.downloadReport = async (req, res) => {
 
     drawTable('Yearly Report', ['#', 'Year', 'Total Expense'], yearlyRows);
 
-    doc.end(); // Finalize PDF stream
+    doc.end();
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error generating PDF report' });

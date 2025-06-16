@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
     default: 'PENDING'
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // Assuming you're referencing a User document
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   }

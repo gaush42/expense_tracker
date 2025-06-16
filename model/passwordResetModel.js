@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const forgotPasswordRequestSchema = new mongoose.Schema({
   _id: {
     type: String,
-    default: uuidv4 // Use UUID string as the _id
+    default: uuidv4 
   },
   isactive: {
     type: Boolean,
@@ -20,7 +20,6 @@ const forgotPasswordRequestSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Optional alias if you still want to call it 'id'
 forgotPasswordRequestSchema.virtual('id').get(function () {
   return this._id;
 });
